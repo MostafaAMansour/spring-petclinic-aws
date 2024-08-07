@@ -1,10 +1,10 @@
-FROM spring_petclinic_eclipse:latest AS builder
-WORKDIR /app
-# FROM eclipse-temurin:latest AS builder
+# FROM spring_petclinic_eclipse:latest AS builder
 # WORKDIR /app
-# COPY . .
-# EXPOSE 8080
-# RUN ./mvnw package
+FROM eclipse-temurin:latest AS builder
+WORKDIR /app
+COPY . .
+EXPOSE 8080
+RUN ./mvnw package
 
 FROM eclipse-temurin:latest AS dev
 WORKDIR /app
