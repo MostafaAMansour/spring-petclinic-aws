@@ -79,6 +79,9 @@ pipeline {
             }
         }
         stage('deploy run') {
+            agent {
+                label 'ubuntu-docker-agent'
+            }
             when {
                 expression {
                     sh(script: 'command -v docker', returnStatus: true) == 0
