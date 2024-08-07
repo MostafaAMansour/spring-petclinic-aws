@@ -48,9 +48,41 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        stage('Deploy check installation') {
             agent {
-                label 'aws-docker-agent'
+                label 'ubuntu-docker-agent'
+            }
+            steps {
+                script {
+                    def dockerInstalled = sh(
+                        script: 'command -v docker',
+                        returnStatus: true
+                    ) == 0
+                    def gitInstalled = sh(
+                        script: 'command -v git',
+                        returnStatus: true
+                    ) == 0
+                    if (!dockerInstalled) {
+                        sh 'apt update'
+                        sh 'sudo apt install apt-transport-https ca-certificates curl software-properties-common'
+                        sh 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -'
+                        sh 'sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"'
+                        sh 'apt update'
+                        sh 'apt-cache policy docker-ce'
+                        sh 'sudo apt install docker-ce'
+                    }
+                    if(!gitInstalled){
+                        sh 'sudo apt update'
+                        sh 'sudo apt install git-all'
+                    }
+                }
+            }
+        }
+        stage('deploy run') {
+            when {
+                expression {
+                    sh(script: 'command -v docker', returnStatus: true) == 0
+                }
             }
             steps {
                 script {
