@@ -48,7 +48,19 @@ pipeline {
                 }
             }
         }
-
+        stage('Deploy') {
+            agent {
+                label 'aws-docker-agent'
+            }
+            steps {
+                script {
+                    // Cloning the reposatory
+                    sh 'git clone https://github.com/MostafaAMansour/spring-petclinic-aws'
+                    // Start services
+                    sh 'docker compose -f spring-petclinic/docker-compose.yml -f spring-petclinic/docker-compose-dev.yml up -d'
+                }
+            }
+        }
         stage('Archive Artifacts') {
             steps {
                 script {
@@ -60,7 +72,6 @@ pipeline {
                 archiveArtifacts artifacts: "${ARTIFACT_DIR}/app/*.jar", allowEmptyArchive: true
             }
         }
-
         stage('Push Docker Images') {
             steps {
                 script {
